@@ -99,6 +99,8 @@ namespace FileTransferTool
             thread1.Join();
             thread2.Join();
 
+            Counter = 0;
+
             TransferCompletedNotification();
 
             return CompareChecksums(sourceFilePath, destinationFilePath);
@@ -150,6 +152,8 @@ namespace FileTransferTool
             {
                 thread.Join();
             }
+
+            Counter = 0;
 
             TransferCompletedNotification();
 
