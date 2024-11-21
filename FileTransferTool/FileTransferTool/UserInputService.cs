@@ -59,7 +59,7 @@ namespace FileTransferTool
                 Console.WriteLine("Select file transfer mode:");
                 Console.WriteLine("1. Default");
                 Console.WriteLine("2. Multithreaded (2 threads)");
-                Console.WriteLine("2. Multithreaded with shared offset (2 threads)");
+                Console.WriteLine("3. Multithreaded with shared offset (2 threads)");
                 Console.Write("Enter your choice (1, 2 or 3): ");
                 string? fileTransferMode = Console.ReadLine();
 
