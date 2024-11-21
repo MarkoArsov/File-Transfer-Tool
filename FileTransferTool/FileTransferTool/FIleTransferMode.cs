@@ -10,6 +10,6 @@ namespace FileTransferTool
     {
         Default = 1,
         Multithreaded = 2,
-        MultithreadedWithCounter = 3
+        MultithreadedWithSharedOffset = 3
     }
 }

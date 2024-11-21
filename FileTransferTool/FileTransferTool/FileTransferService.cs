@@ -17,7 +17,7 @@ namespace FileTransferTool
         private readonly int MaxRetries;
 
         private readonly object LockObject;
-        private long SharedOffeset;
+        private long SharedOffset;
 
         private Stopwatch Stopwatch;
 
@@ -27,7 +27,7 @@ namespace FileTransferTool
             MaxRetries = 3;
 
             LockObject = new object();
-            SharedOffeset = 0;
+            SharedOffset = 0;
 
             Stopwatch = new Stopwatch();
         }
@@ -38,7 +38,7 @@ namespace FileTransferTool
             MaxRetries = maxRetries;
 
             LockObject = new object();
-            SharedOffeset = 0;
+            SharedOffset = 0;
 
             Stopwatch = new Stopwatch();
         }
@@ -56,7 +56,7 @@ namespace FileTransferTool
             {
                 FileTransferMode.Default => TransferFileDefault(sourceFilePath, destinationFilePath, fileSize),
                 FileTransferMode.Multithreaded => TransferFileWithTwoThreads(sourceFilePath, destinationFilePath, fileSize),
-                FileTransferMode.MultithreadedWithCounter => TransferFileWithTwoThreadsAndCounter(sourceFilePath, destinationFilePath, fileSize),
+                FileTransferMode.MultithreadedWithSharedOffset => TransferFileWithTwoThreadsAndSharedOffset(sourceFilePath, destinationFilePath, fileSize),
                 _ => throw new ArgumentException("Invalid transfer mode selected")
             };
         }
@@ -88,10 +88,10 @@ namespace FileTransferTool
             return CompareChecksums(sourceFilePath, destinationFilePath);
         }
 
-        private bool TransferFileWithTwoThreadsAndCounter(string sourceFilePath, string destinationFilePath, long fileSize)
+        private bool TransferFileWithTwoThreadsAndSharedOffset(string sourceFilePath, string destinationFilePath, long fileSize)
         {
-            Thread thread1 = new Thread(() => TransferAndVerifyChunksWithCounter(sourceFilePath, destinationFilePath, fileSize));
-            Thread thread2 = new Thread(() => TransferAndVerifyChunksWithCounter(sourceFilePath, destinationFilePath, fileSize));
+            Thread thread1 = new Thread(() => TransferAndVerifyChunksWithSharedOffset(sourceFilePath, destinationFilePath, fileSize));
+            Thread thread2 = new Thread(() => TransferAndVerifyChunksWithSharedOffset(sourceFilePath, destinationFilePath, fileSize));
 
             thread1.Start();
             thread2.Start();
@@ -99,7 +99,7 @@ namespace FileTransferTool
             thread1.Join();
             thread2.Join();
 
-            SharedOffeset = 0;
+            SharedOffset = 0;
 
             TransferCompletedNotification();
 
@@ -134,7 +134,7 @@ namespace FileTransferTool
             return CompareChecksums(sourceFilePath, destinationFilePath);
         }
 
-        private bool TransferFileWithMultipleThreadsAndCounter(string sourceFilePath, string destinationFilePath, long fileSize, int numberOfThreads)
+        private bool TransferFileWithMultipleThreadsAndSharedOffeset(string sourceFilePath, string destinationFilePath, long fileSize, int numberOfThreads)
         {
             if (numberOfThreads > 2)
                 throw new ArgumentException("Number of threads must be greater than one");
@@ -143,7 +143,7 @@ namespace FileTransferTool
 
             for (int i = 0; i < numberOfThreads; i++)
             {
-                Thread thread = new Thread(() => TransferAndVerifyChunksWithCounter(sourceFilePath, destinationFilePath, fileSize));
+                Thread thread = new Thread(() => TransferAndVerifyChunksWithSharedOffset(sourceFilePath, destinationFilePath, fileSize));
                 threads.Add(thread);
                 thread.Start();
             }
@@ -153,7 +153,7 @@ namespace FileTransferTool
                 thread.Join();
             }
 
-            SharedOffeset = 0;
+            SharedOffset = 0;
 
             TransferCompletedNotification();
 
@@ -184,7 +184,7 @@ namespace FileTransferTool
             }
         }
 
-        private void TransferAndVerifyChunksWithCounter(string sourceFilePath, string destinationFilePath, long length)
+        private void TransferAndVerifyChunksWithSharedOffset(string sourceFilePath, string destinationFilePath, long length)
         {
             using (FileStream sourceStream = new FileStream(sourceFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (FileStream destinationStream = new FileStream(destinationFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite))
@@ -195,11 +195,11 @@ namespace FileTransferTool
                 {
                     lock (LockObject)
                     {
-                        if (SharedOffeset >= length)
+                        if (SharedOffset >= length)
                             break;
 
-                        offset = SharedOffeset;
-                        SharedOffeset += ChunkSize;
+                        offset = SharedOffset;
+                        SharedOffset += ChunkSize;
                     }
 
                     var (buffer, bytesRead) = TransferChunk(sourceStream, destinationStream, offset);
