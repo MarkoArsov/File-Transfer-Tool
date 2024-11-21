@@ -17,7 +17,7 @@ namespace FileTransferTool
         private readonly int MaxRetries;
 
         private readonly object LockObject;
-        private int Counter;
+        private long SharedOffeset;
 
         private Stopwatch Stopwatch;
 
@@ -27,7 +27,7 @@ namespace FileTransferTool
             MaxRetries = 3;
 
             LockObject = new object();
-            Counter = 0;
+            SharedOffeset = 0;
 
             Stopwatch = new Stopwatch();
         }
@@ -38,7 +38,7 @@ namespace FileTransferTool
             MaxRetries = maxRetries;
 
             LockObject = new object();
-            Counter = 0;
+            SharedOffeset = 0;
 
             Stopwatch = new Stopwatch();
         }
@@ -99,7 +99,7 @@ namespace FileTransferTool
             thread1.Join();
             thread2.Join();
 
-            Counter = 0;
+            SharedOffeset = 0;
 
             TransferCompletedNotification();
 
@@ -153,7 +153,7 @@ namespace FileTransferTool
                 thread.Join();
             }
 
-            Counter = 0;
+            SharedOffeset = 0;
 
             TransferCompletedNotification();
 
@@ -195,11 +195,11 @@ namespace FileTransferTool
                 {
                     lock (LockObject)
                     {
-                        if (Counter >= length)
+                        if (SharedOffeset >= length)
                             break;
 
-                        offset = Counter;
-                        Counter += ChunkSize;
+                        offset = SharedOffeset;
+                        SharedOffeset += ChunkSize;
                     }
 
                     var (buffer, bytesRead) = TransferChunk(sourceStream, destinationStream, offset);
