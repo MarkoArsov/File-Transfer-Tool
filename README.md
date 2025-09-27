@@ -1,23 +1,21 @@
 # File Transfer Tool
 
-A simple and efficient tool for transferring files between devices on the same network. This tool provides a graphical user interface (GUI) to easily select, send, and receive files.
+A secure, multi-threaded command-line tool for transferring files over a network, built with .NET. This application uses a client-server architecture to send and receive files, with AES encryption to ensure data privacy during transit.
 
-## Features
+## Core Features
 
-*   **User-Friendly Interface:** A clean and intuitive graphical user interface for easy operation.
-*   **File Selection:** A file dialog allows users to browse and select any file they wish to transfer.
-*   **IP Address and Port Configuration:** Manually configure the IP address and port number for both sending and receiving files.
-*   **Send Functionality:**  Initiate a file transfer to a receiving device.
-*   **Receive Functionality:**  Listen for incoming file transfers on a specified IP address and port.
-*   **Cross-platform:** Built with .NET, this tool can be run on any operating system that supports the .NET runtime.
+*   **Secure Transfers:** All files are encrypted using AES (Advanced Encryption Standard) before transmission and decrypted upon arrival.
+*   **Multi-threaded Server:** The server is capable of handling multiple client connections simultaneously, allowing for concurrent file transfers.
+*   **Command-Line Interface:** A straightforward and scriptable CLI for initiating transfers.
+*   **Cross-Platform:** Developed with .NET, it can be compiled and run on Windows, macOS, and Linux.
 
 ## Getting Started
 
-Follow these instructions to get a copy of the project up and running on your local machine.
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 
-*   [.NET SDK](https://dotnet.microsoft.com/download)
+You will need the [.NET SDK](https://dotnet.microsoft.com/download) installed on your machine.
 
 ### Installation
 
@@ -25,31 +23,13 @@ Follow these instructions to get a copy of the project up and running on your lo
     ```sh
     git clone https://github.com/MarkoArsov/File-Transfer-Tool.git
     ```
+
 2.  **Navigate to the project directory:**
     ```sh
     cd File-Transfer-Tool/FileTransferTool
     ```
+
 3.  **Build the project:**
     ```sh
     dotnet build
     ```
-
-## Usage
-
-1.  **Run the application:**
-    ```sh
-    dotnet run
-    ```
-
-2.  **To Send a File:**
-    *   Click the **"Select File"** button to open a file dialog.
-    *   Choose the file you want to send. The file path will appear in the text box.
-    *   In the "IP Address" and "Port" fields, enter the IP address and port of the computer that will be receiving the file.
-    *   Click the **"Send"** button to begin the transfer.
-
-3.  **To Receive a File:**
-    *   On the receiving computer, run the application.
-    *   Enter the IP address and port that the sending computer will use to connect. This should be the IP address of the receiving computer itself.
-    *   Click the **"Receive"** button. The application will now listen for an incoming file transfer.
-    *   Once the file is received, it will be saved in the same directory where the application is running.
-
